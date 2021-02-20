@@ -1,4 +1,4 @@
 {
-  "apiUrl": "https://murmuring-lowlands-56962.herokuapp.com/psapi",
-  "imageUrl": "https://murmuring-lowlands-56962.herokuapp.com/"
+  "apiUrl": "http://localhost:3900/psapi",
+  "imageUrl": "http://localhost:3900"
 }
