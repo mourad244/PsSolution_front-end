@@ -85,7 +85,6 @@ class Form extends Component {
     const form = this.state.form;
 
     let data = { ...this.state.data };
-    console.log(data);
     delete data._id;
     delete data.images;
     delete data.accessoires;
@@ -100,7 +99,6 @@ class Form extends Component {
       if (item.includes("selected")) {
         let filename = item.replace("selected", "");
         for (let i = 0; i < this.state[item][0].length; i++) {
-          console.log(this.state[item][0][i]);
           fd.append(
             filename,
             this.state[item][0][i],
@@ -115,7 +113,7 @@ class Form extends Component {
       : axios.post(`/${form}`, fd);
     if (this.props.match) this.props.history.push(`/${form}`);
     else {
-      // window.location.reload();
+      window.location.reload();
     }
   };
 
