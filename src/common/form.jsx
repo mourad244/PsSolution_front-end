@@ -80,12 +80,15 @@ class Form extends Component {
     this.doSubmit();
   };
 
-  fileUploadHandler = () => {
+  fileUploadHandler = async () => {
     const fd = new FormData();
     const form = this.state.form;
 
     let data = { ...this.state.data };
+    console.log(data);
     delete data._id;
+    delete data.images;
+    delete data.accessoires;
     for (const item in data) {
       if (Array.isArray(data[item])) {
         data[item].map((i, index) => fd.append(item + `[${index}]`, i));
@@ -96,12 +99,14 @@ class Form extends Component {
     for (const item in this.state) {
       if (item.includes("selected")) {
         let filename = item.replace("selected", "");
-        for (let i = 0; i < this.state[item][0].length; i++)
+        for (let i = 0; i < this.state[item][0].length; i++) {
+          console.log(this.state[item][0][i]);
           fd.append(
             filename,
             this.state[item][0][i],
             this.state[item][0][i].name
           );
+        }
       }
     }
     this.props.match != undefined &&
@@ -110,7 +115,7 @@ class Form extends Component {
       : axios.post(`/${form}`, fd);
     if (this.props.match) this.props.history.push(`/${form}`);
     else {
-      window.location.reload();
+      // window.location.reload();
     }
   };
 
