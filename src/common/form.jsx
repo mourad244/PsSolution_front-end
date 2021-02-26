@@ -107,6 +107,7 @@ class Form extends Component {
         }
       }
     }
+    console.log(`${process.env.REACT_APP_API_IMAGE_URL}`);
     this.props.match != undefined &&
     this.props.match.params.id /* && this.props.match.params.id != "new" */
       ? await axios.put(
