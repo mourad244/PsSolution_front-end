@@ -1,163 +1,133 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from 'react';
+import { getProducts, deleteProduct } from '../services/productService';
+import { getProductsType } from '../services/productTypeService';
+import ProductsTable from './productsTable';
+import ProductForm from './productForm';
+import Pagination from '../common/pagination';
+import ListGroup from '../common/listGroup';
+import SearchBox from '../common/searchBox';
+import { paginate } from '../utils/paginate';
+import { toast } from 'react-toastify';
+import _ from 'lodash';
 
-import { getProducts, deleteProduct } from "../services/productService";
-import { getProductsType } from "../services/productTypeService";
+function Products(props) {
+	const [products, setProducts] = useState([]);
+	const [types, setTypes] = useState([]);
 
-import ProductsTable from "./productsTable";
-import ProductForm from "./productForm";
-import Pagination from "../common/pagination";
-import ListGroup from "../common/listGroup";
+	const [formDisplay, setFormDisplay] = useState(false);
+	const [currentPage, setCurrentPage] = useState(1);
+	const pageSize = 10;
+	const [searchQuery, setSearchQuery] = useState('');
+	const [selectedType, setSelectedType] = useState(null);
+	const [sortColumn, setSortColumn] = useState({ path: 'name', order: 'asc' });
+	const [totalCount, setTotalCount] = useState(0);
+	const [filteredProducts, setFilteredProducts] = useState([]);
 
-import SearchBox from "../common/searchBox";
+	useEffect(() => {
+		const fetchData = async () => {
+			console.log('fetch data');
+			const { data } = await getProductsType();
+			const types = [{ _id: '', name: 'Tous les types' }, ...data];
+			const { data: products } = await getProducts();
+			setTypes(types);
+			setProducts(products);
+		};
+		fetchData();
+	}, []);
 
-import { paginate } from "../utils/paginate";
+	useEffect(() => {
+		const getData = async () => {
+			let filtered = products;
+			if (searchQuery)
+				filtered = products.filter((m) => m.name.toLowerCase().startsWith(searchQuery.toLowerCase()));
+			else if (selectedType && selectedType._id) {
+				filtered = products.filter((m) => m.type._id === selectedType._id);
+			}
+			const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
-import { toast } from "react-toastify";
+			const filteredProducts = paginate(sorted, currentPage, pageSize);
 
-import _ from "lodash";
+			setTotalCount(filtered.length);
+			setFilteredProducts(filteredProducts);
+		};
+		getData();
+	}, [currentPage, products, searchQuery, selectedType, sortColumn.order, sortColumn.path, totalCount]);
+	const handleDelete = async (product) => {
+		const originalProducts = products;
+		setProducts(products.filter((m) => m._id !== product._id));
 
-class Products extends Component {
-  state = {
-    formDisplay: false,
-    products: [],
-    types: [],
-    currentPage: 1,
-    pageSize: 10,
-    searchQuery: "",
-    selectedType: null,
-    sortColumn: { path: "name", order: "asc" },
-  };
-  async componentDidMount() {
-    const { data } = await getProductsType();
-    const types = [{ _id: "", name: "Tous les types" }, ...data];
+		try {
+			await deleteProduct(product._id);
+		} catch (ex) {
+			if (ex.response && ex.response.status === 404) toast.error('product déja supprimé');
+			setProducts(originalProducts);
+		}
+	};
 
-    const { data: products } = await getProducts();
+	const handlePageChange = (page) => {
+		setCurrentPage(page);
+	};
+	const handleTypeSelect = (type) => {
+		setSelectedType(type);
+		setSearchQuery('');
+		setCurrentPage(1);
+	};
 
-    this.setState({ products, types });
-  }
+	const handleSearch = (query) => {
+		setSearchQuery(query);
+		setSelectedType(null);
+		setCurrentPage(1);
+	};
 
-  handleDelete = async (product) => {
-    const originalProducts = this.state.products;
-    const products = originalProducts.filter((m) => m._id !== product._id);
-    this.setState({ products });
+	const handleSort = (sortColumn) => {
+		setSortColumn(sortColumn);
+	};
 
-    try {
-      await deleteProduct(product._id);
-    } catch (ex) {
-      if (ex.response && ex.response.status === 404)
-        toast.error("product déja supprimé");
-      this.setState({ products: originalProducts });
-    }
-  };
+	const toggleForm = () => {
+		setFormDisplay(!formDisplay);
+	};
 
-  handlePageChange = (page) => {
-    this.setState({ currentPage: page });
-  };
-  handleTypeSelect = (type) => {
-    this.setState({
-      selectedType: type,
-      searchQuery: "",
-      currentPage: 1,
-    });
-  };
+	const { user } = props;
+	if (totalCount === 0) {
+		console.log('done');
+		return (
+			<div className="row">
+				<div className="col-3">
+					<ListGroup items={types} selectedItem={selectedType} onItemSelect={handleTypeSelect}></ListGroup>
+				</div>
+				<div className="col">
+					<h2>aucun produit dans la base de donnée</h2>
+					{user && <ProductForm formDisplay={formDisplay} toggleForm={toggleForm} />}
+					<SearchBox value={searchQuery} onChange={handleSearch}></SearchBox>
+				</div>
+			</div>
+		);
+	}
+	console.log('total count :	' + totalCount);
 
-  handleSearch = (query) =>
-    this.setState({
-      searchQuery: query,
-      selectedType: null,
-      currentPage: 1,
-    });
-
-  handleSort = (sortColumn) => {
-    this.setState({ sortColumn });
-  };
-
-  toggleForm = () => {
-    this.setState({
-      formDisplay: !this.state.formDisplay,
-    });
-  };
-
-  getPagedData = () => {
-    const {
-      pageSize,
-      currentPage,
-      sortColumn,
-      selectedType,
-      searchQuery,
-      products: allProducts,
-    } = this.state;
-
-    let filtered = allProducts;
-    if (searchQuery)
-      filtered = allProducts.filter((m) =>
-        m.name.toLowerCase().startsWith(searchQuery.toLowerCase())
-      );
-    else if (selectedType && selectedType._id) {
-      filtered = allProducts.filter((m) => m.type._id === selectedType._id);
-    }
-    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
-
-    const products = paginate(sorted, currentPage, pageSize);
-    return { totalCount: filtered.length, data: products };
-  };
-
-  render() {
-    const { length: count } = this.state.products;
-    const { pageSize, currentPage, sortColumn, searchQuery } = this.state;
-    const { user } = this.props;
-
-    if (count === 0)
-      return (
-        <div>
-          <h2>aucun produit dans la base de donnée</h2>
-          {user && (
-            <ProductForm
-              formDisplay={this.state.formDisplay}
-              toggleForm={this.toggleForm}
-            />
-          )}
-        </div>
-      );
-
-    const { totalCount, data: products } = this.getPagedData();
-    return (
-      <div className="row">
-        <div className="col-3">
-          <ListGroup
-            items={this.state.types}
-            selectedItem={this.state.selectedType}
-            onItemSelect={this.handleTypeSelect}
-          ></ListGroup>
-        </div>
-        <div className="col">
-          <h3>il ya {totalCount} produits dans la base de données</h3>
-          {user && (
-            <ProductForm
-              formDisplay={this.state.formDisplay}
-              toggleForm={this.toggleForm}
-            />
-          )}
-          <SearchBox
-            value={searchQuery}
-            onChange={this.handleSearch}
-          ></SearchBox>
-          <ProductsTable
-            products={products}
-            sortColumn={sortColumn}
-            onDelete={this.handleDelete}
-            onSort={this.handleSort}
-          ></ProductsTable>
-          <Pagination
-            itemsCount={totalCount}
-            pageSize={pageSize}
-            currentPage={currentPage}
-            onPageChange={this.handlePageChange}
-          ></Pagination>
-        </div>
-      </div>
-    );
-  }
+	return (
+		<div className="row">
+			<div className="col-3">
+				<ListGroup items={types} selectedItem={selectedType} onItemSelect={handleTypeSelect}></ListGroup>
+			</div>
+			<div className="col">
+				<h3>il ya {totalCount} produits dans la base de données</h3>
+				{user && <ProductForm formDisplay={formDisplay} toggleForm={toggleForm} />}
+				<SearchBox value={searchQuery} onChange={handleSearch}></SearchBox>
+				<ProductsTable
+					products={filteredProducts}
+					sortColumn={sortColumn}
+					onDelete={handleDelete}
+					onSort={handleSort}
+				></ProductsTable>
+				<Pagination
+					itemsCount={totalCount}
+					pageSize={pageSize}
+					currentPage={currentPage}
+					onPageChange={handlePageChange}
+				></Pagination>
+			</div>
+		</div>
+	);
 }
-
 export default Products;
