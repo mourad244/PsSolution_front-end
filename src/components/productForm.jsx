@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React /* useState, useEffect */ from 'react';
 import { FaPlus } from 'react-icons/fa';
 import Joi from 'joi-browser';
 import Form from '../common/form';
@@ -98,7 +98,7 @@ class ProductForm extends Form {
 }
 
 // hooks
-function ProductForm2(props) {
+/* function ProductForm2(props) {
 	const [data, setData] = useState({
 		type: '',
 		name: '',
@@ -168,7 +168,7 @@ function ProductForm2(props) {
 				<FaPlus /> Ajouter produit
 			</div>
 			<div className="card-body">
-				{/* <Form id="aptForm" noValidate onSubmit={handleSubmit}>
+				{<Form id="aptForm" noValidate onSubmit={handleSubmit}>
 					{renderInput('name', 'Nom')}
 					{data.images.length !== 0 && this.renderImage('images', 'Image')}
 					{renderUpload('image', 'upload image')}
@@ -176,10 +176,10 @@ function ProductForm2(props) {
 					{renderInputList('description', 'Description')}
 					{renderSelect('type', 'Type de produit', types)}
 					{renderButton('Sauvegarder')}
-			</Form> */}
+			</Form>}
 			</div>
 		</div>
 	);
-}
+} */
 
 export default ProductForm;
