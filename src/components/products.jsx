@@ -13,15 +13,15 @@ import _ from 'lodash';
 function Products(props) {
 	const [products, setProducts] = useState([]);
 	const [types, setTypes] = useState([]);
+	const [selectedType, setSelectedType] = useState(null);
+	const [filteredProducts, setFilteredProducts] = useState([]);
 
 	const [formDisplay, setFormDisplay] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
-	const pageSize = 10;
-	const [searchQuery, setSearchQuery] = useState('');
-	const [selectedType, setSelectedType] = useState(null);
 	const [sortColumn, setSortColumn] = useState({ path: 'name', order: 'asc' });
 	const [totalCount, setTotalCount] = useState(0);
-	const [filteredProducts, setFilteredProducts] = useState([]);
+	const [searchQuery, setSearchQuery] = useState('');
+	const pageSize = 10;
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -52,6 +52,7 @@ function Products(props) {
 		getData();
 		setTotalCount(filtered.length);
 	}, [selectedType, currentPage, products, searchQuery, sortColumn.order, sortColumn.path]);
+
 	const handleDelete = async (product) => {
 		const originalProducts = products;
 		setProducts(products.filter((m) => m._id !== product._id));
@@ -102,7 +103,6 @@ function Products(props) {
 			</div>
 		);
 	}
-	console.log('total count :	' + totalCount);
 
 	return (
 		<div className="row">

@@ -195,7 +195,6 @@ class Form extends Component {
 
 	renderInput(name, label, type = 'text') {
 		const { data, errors } = this.state;
-		console.log(name + ': ' + data[name]);
 		return (
 			<Input
 				type={type}
