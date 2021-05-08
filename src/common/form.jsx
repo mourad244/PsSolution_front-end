@@ -1,10 +1,276 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import Joi from 'joi-browser';
 import Input from './input';
 import Select from './select';
 import axios from 'axios';
 import DisplayImage from './displayImage';
 import UploadImage from './uploadImage';
+
+function Form2(props) {
+	// return <div>{props.children}</div>;
+	const [data, setData] = useState(props.data);
+	const [errors, setErrors] = useState({});
+	const [form, setForm] = useState('');
+	const [input, setInput] = useState({});
+	const [sendFile, setSendFile] = useState(false);
+	const [fileObj, setFileObj] = useState([]);
+	const [fileArray, setFileArray] = useState([]);
+	const [state, setState] = useState([]);
+	const [item, setItem] = useState({});
+
+	function onChangeState(name, value) {
+		setState((prevState) => ({ ...prevState, [name]: value }));
+	}
+
+	function onChangeItem(name, value) {
+		setItem((prevState) => ({ ...prevState, [name]: value }));
+	}
+
+	const validate = () => {
+		const options = { abortEarly: false };
+		const { error } = Joi.validate(data, props.schema, options);
+		if (!error) return null;
+
+		const errors = {};
+		for (let item of error.details) errors[item.path[0]] = item.message;
+
+		return errors;
+	};
+	const validateProperty = ({ name, value }) => {
+		const obj = { [name]: value };
+		const schema = { [name]: props.schema[name] };
+		const { error } = Joi.validate(obj, schema);
+		return error ? error.details[0].message : null;
+	};
+
+	const handleChangeList = ({ currentTarget: input }, index) => {
+		const errors2 = { ...errors };
+
+		const errorMessage = this.validateProperty(input);
+		if (errorMessage) errors2[input.name] = errorMessage;
+		else delete errors[input.name];
+
+		const data2 = { ...data };
+
+		data2[input.name][index] = input.value;
+		setData(data2);
+		setErrors(errors2);
+	};
+
+	const handleChange = ({ currentTarget: input }) => {
+		const errors2 = { ...errors };
+		const errorMessage = this.validateProperty(input);
+		if (errorMessage) errors2[input.name] = errorMessage;
+		else delete errors2[input.name];
+
+		const data2 = { ...data };
+		data2[input.name] = input.value;
+		setData(data2);
+		setErrors(errors);
+	};
+
+	const handleDeleteItem = (e, array, i) => {
+		e.preventDefault();
+
+		const data2 = { ...data };
+		data2[array].splice(i, 1);
+		setData(data2);
+	};
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		setErrors(validate() || {});
+		if (sendFile) {
+			return fileUploadHandler();
+		}
+		if (errors) return;
+		props.doSubmit();
+	};
+
+	const fileSelectedHandler = (event) => {
+		let fileObj = [];
+		let fileArray = [];
+		if (event.target.files && event.target.files[0]) {
+			fileObj.push(event.target.files);
+			for (let i = 0; i < fileObj[0].length; i++) {
+				fileArray.push(URL.createObjectURL(fileObj[0][i]));
+			}
+			onChangeState(['selected' + event.target.name], fileObj);
+			onChangeState([event.target.name], fileArray);
+
+			setSendFile(true);
+		}
+	};
+
+	const renderUpload = (name, label, type = 'file') => {
+		const height = 200;
+
+		return (
+			<div>
+				<UploadImage
+					name={name}
+					image={name}
+					height={height}
+					type={type}
+					label={label}
+					onChange={fileSelectedHandler}
+				/>
+			</div>
+		);
+	};
+
+	const renderImage = (name, label) => {
+		const height = 200;
+		return (
+			<div className="form-group form-row">
+				<label className="col-md-2 col-form-label text-md  align-self-center" htmlFor={name}>
+					{label}
+				</label>
+				<DisplayImage name={name} images={data[name]} label={label} height={height} />
+			</div>
+		);
+	};
+
+	const renderButton = (label) => {
+		return (
+			<div className="form-group form-row mb-0">
+				<div className="offset-md-2 col-md-10">
+					<button disabled={validate()} className="btn btn-primary d-block ml-auto">
+						{label}
+					</button>
+				</div>
+			</div>
+		);
+	};
+
+	const renderSelect = (name, label, options) => {
+		return (
+			<Select
+				name={name}
+				value={data[name]}
+				label={label}
+				options={options}
+				onChange={handleChange}
+				error={errors[name]}
+			></Select>
+		);
+	};
+
+	const renderInput = (name, label, type = 'text') => {
+		return (
+			<Input
+				type={type}
+				name={name}
+				value={data[name]}
+				label={label}
+				onChange={handleChange}
+				error={errors[name]}
+			/>
+		);
+	};
+
+	const addItem = (e, inputItem) => {
+		e.preventDefault();
+		const errors2 = { ...errors };
+
+		const errorMessage = validateProperty(e.currentTarget);
+		if (errorMessage) errors2[e.currentTarget.name] = errorMessage;
+		else delete errors2[e.currentTarget.name];
+
+		const data2 = { ...data };
+
+		data2[e.currentTarget.name].push(inputItem);
+		setData(data2);
+		setErrors(errors2);
+		onChangeItem([e.target.name], '');
+	};
+
+	const updateInputItem = (e) => {
+		setInput({ [e.target.name]: e.target.value });
+	};
+
+	const renderInputList = (name, label, type = 'text') => {
+		const inputItem = [name];
+		return (
+			<div>
+				<button className="col-md-1  btn-sm  pull-right" name={name} onClick={(e) => addItem(e, inputItem)}>
+					+
+				</button>
+				<Input
+					key={name}
+					value={inputItem || ''}
+					name={name}
+					type={type}
+					label={label}
+					placeholder={`add ${name}`}
+					onChange={updateInputItem}
+					// error={errors[name]}
+				/>
+			</div>
+		);
+	};
+
+	const renderList = (name, label) => {
+		return (
+			<div>
+				<div>
+					{data[name].map((item, index) => {
+						return (
+							<div key={index}>
+								<button
+									onClick={(e) => handleDeleteItem(e, name, index)}
+									className=" col-md-1 btn btn-danger btn-sm pull-right"
+								>
+									-
+								</button>
+								<Input
+									name={name}
+									key={name + index}
+									value={item}
+									label={label + ' ' + (index + 1)}
+									onChange={(e) => handleChangeList(e, index)}
+									error={errors[name]}
+								/>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+		);
+	};
+
+	const fileUploadHandler = async () => {
+		const fd = new FormData();
+
+		let data2 = { ...data };
+		delete data2._id;
+		delete data2.images;
+		delete data2.accessoires;
+		for (const item in data2) {
+			if (Array.isArray(data2[item])) {
+				data2[item].map((i, index) => fd.append(item + `[${index}]`, i));
+			} else {
+				fd.append(item, data[item]);
+			}
+		}
+
+		// calling dynamically the setState
+		for (const item in setState) {
+			let filename = item.replace('selected', '');
+			for (let i = 0; i < setState[item][0].length; i++) {
+				fd.append(filename, item[0][i], item[0][i].name);
+			}
+		}
+		this.props.match !== undefined && props.match.params.id /* && this.props.match.params.id != "new" */
+			? await axios.put(`{${form}/${props.match.params.id}`, fd)
+			: await axios.post(`/${form}`, fd);
+		if (props.match) this.props.history.push(`/${form}`);
+		else {
+			window.location.reload();
+		}
+	};
+}
+
 class Form extends Component {
 	state = {
 		data: {},
@@ -194,11 +460,12 @@ class Form extends Component {
 
 	renderInput(name, label, type = 'text') {
 		const { data, errors } = this.state;
+		console.log(name + ': ' + data[name]);
 		return (
 			<Input
 				type={type}
 				name={name}
-				value={data[name]}
+				value={data[name] || ''}
 				label={label}
 				onChange={this.handleChange}
 				error={errors[name]}
@@ -252,7 +519,6 @@ class Form extends Component {
 
 	renderList(name, label) {
 		const { data, errors /* , inputItem  */ } = this.state;
-
 		return (
 			<div>
 				<div>
@@ -265,6 +531,7 @@ class Form extends Component {
 								>
 									-
 								</button>
+
 								<Input
 									name={name}
 									key={name + index}
@@ -277,22 +544,6 @@ class Form extends Component {
 						);
 					})}
 				</div>
-				{/* <div>
-          <button
-            className="col-md-1  btn-sm  pull-right"
-            name={name}
-            onClick={(e) => this.addItem(e, inputItem)}
-          >
-            +
-          </button>
-          <Input
-            name={name}
-            label={label}
-            placeholder={`add ${name}`}
-            onChange={this.updateInputItem}
-            error={errors[name]}
-          />
-        </div> */}
 			</div>
 		);
 	}

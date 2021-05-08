@@ -21,7 +21,7 @@ class ProductTypeForm extends Form {
 	schema = {
 		_id: Joi.string(),
 		name: Joi.string().required().label('Nom'),
-		images: Joi.label('images'),
+		images: Joi.label('images').optional(),
 		description: Joi.string().label('description').allow(''),
 		categorie: Joi.string().required().label('categorie de produit')
 	};

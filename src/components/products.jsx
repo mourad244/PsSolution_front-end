@@ -36,8 +36,8 @@ function Products(props) {
 	}, []);
 
 	useEffect(() => {
+		let filtered = products;
 		const getData = async () => {
-			let filtered = products;
 			if (searchQuery)
 				filtered = products.filter((m) => m.name.toLowerCase().startsWith(searchQuery.toLowerCase()));
 			else if (selectedType && selectedType._id) {
@@ -47,11 +47,11 @@ function Products(props) {
 
 			const filteredProducts = paginate(sorted, currentPage, pageSize);
 
-			setTotalCount(filtered.length);
 			setFilteredProducts(filteredProducts);
 		};
 		getData();
-	}, [currentPage, products, searchQuery, selectedType, sortColumn.order, sortColumn.path, totalCount]);
+		setTotalCount(filtered.length);
+	}, [selectedType, currentPage, products, searchQuery, sortColumn.order, sortColumn.path]);
 	const handleDelete = async (product) => {
 		const originalProducts = products;
 		setProducts(products.filter((m) => m._id !== product._id));
@@ -89,7 +89,6 @@ function Products(props) {
 
 	const { user } = props;
 	if (totalCount === 0) {
-		console.log('done');
 		return (
 			<div className="row">
 				<div className="col-3">

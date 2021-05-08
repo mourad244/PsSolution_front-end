@@ -20,10 +20,10 @@ class ServiceCategorieForm extends Form {
 	schema = {
 		_id: Joi.string(),
 		name: Joi.string().required().label('Nom'),
+		images: Joi.array(),
 		smallDesc: Joi.string().label('Petite Description').allow(''),
 		largeDesc: Joi.label('Large description'),
-		assistance: Joi.label('Assistance'),
-		images: Joi.array()
+		assistance: Joi.label('Assistance')
 	};
 
 	async populateServicesCategorie() {
