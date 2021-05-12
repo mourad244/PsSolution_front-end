@@ -25,7 +25,6 @@ function Products(props) {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			console.log('fetch data');
 			const { data } = await getProductsType();
 			const types = [{ _id: '', name: 'Tous les types' }, ...data];
 			const { data: products } = await getProducts();
