@@ -19,6 +19,7 @@ import Logout from './components/logout';
 import auth from './services/authService';
 import ProtectedRoute from './common/protectedRoute';
 
+import Sidebar from './Layout/Sidebar';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
@@ -31,23 +32,31 @@ const App = () => {
 
 	return (
 		<React.Fragment>
-			<NavBar user={yser} />
+			<Sidebar />
 			<main className="container">
 				<Switch>
 					{/* <Route path="/register" component={RegisterForm} /> */}
-					<Route path="/login" component={LoginForm} />
-					<Route path="/logout" component={Logout} />
-					<ProtectedRoute path="/servicescategorie/:id" component={ServiceCategorieForm} />
-					<Route path="/servicescategorie" render={(props) => <ServicesCategorie {...props} user={yser} />} />
-					<ProtectedRoute path="/services/:id" component={ServiceForm} />
-					<Route path="/services" render={(props) => <Services {...props} user={yser} />} />
-					<ProtectedRoute path="/productsCategorie/:id" component={ProductCategorieForm} />
-					<Route path="/productscategorie" render={(props) => <ProductsCategorie {...props} user={yser} />} />
-					<ProtectedRoute path="/productstype/:id" component={ProductTypeForm} />
-					<Route path="/productstype" render={(props) => <ProductsType {...props} user={yser} />} />
-					<ProtectedRoute path="/products/:id" component={ProductForm} />
-					<Route path="/products" render={(props) => <Products {...props} user={yser} />} />
-					<Route path="/not-found" component={NotFound} />
+					<Route path="/login" exact component={LoginForm} />
+					<Route path="/logout" exact component={Logout} />
+					<ProtectedRoute path="/servicescategorie/:id" exact component={ServiceCategorieForm} />
+					<Route
+						path="/servicescategorie"
+						exact
+						render={(props) => <ServicesCategorie {...props} user={yser} />}
+					/>
+					<ProtectedRoute path="/services/:id" exact component={ServiceForm} />
+					<Route path="/services" exact render={(props) => <Services {...props} user={yser} />} />
+					<ProtectedRoute path="/productsCategorie/:id" exact component={ProductCategorieForm} />
+					<Route
+						path="/productscategorie"
+						exact
+						render={(props) => <ProductsCategorie {...props} user={yser} />}
+					/>
+					<ProtectedRoute path="/productstype/:id" exact component={ProductTypeForm} />
+					<Route path="/productstype" exact render={(props) => <ProductsType {...props} user={yser} />} />
+					<ProtectedRoute path="/products/:id" exact component={ProductForm} />
+					<Route path="/products" exact render={(props) => <Products {...props} user={yser} />} />
+					<Route path="/not-found" exact component={NotFound} />
 					<Redirect from="/" exact to="/products" />
 					<Redirect to="/not-found" />
 				</Switch>
