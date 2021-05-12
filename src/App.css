@@ -15,3 +15,7 @@ h6 {
 	height: 100%;
 	text-align: center;
 }
+
+.add-item .card-body {
+	display: none;
+}
