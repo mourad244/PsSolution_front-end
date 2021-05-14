@@ -106,15 +106,15 @@ class Services extends Component {
 
 		const { totalCount, data: services } = this.getPagedData();
 		return (
-			<div className="row">
-				<div className="col-3">
+			<div>
+				<div className="filter">
 					<ListGroup
 						items={this.state.categories}
 						selectedItem={this.state.selectedCategorie}
 						onItemSelect={this.handleCategorieSelect}
 					></ListGroup>
 				</div>
-				<div className="col">
+				<div>
 					<h3>il ya {totalCount} services dans la base de données</h3>
 
 					{user && <ServiceForm formDisplay={this.state.formDisplay} toggleForm={this.toggleForm} />}

@@ -92,15 +92,15 @@ function ProductsType(props) {
 
 	if (totalCount === 0) {
 		return (
-			<div className="row">
-				<div className="col-3">
+			<div>
+				<div className="filter">
 					<ListGroup
 						items={categories}
 						selectedItem={selectedCategorie}
 						onItemSelect={handleCategorieSelect}
 					></ListGroup>
 				</div>
-				<div className="col">
+				<div>
 					<h2>aucun type de produit dans la base de donnée</h2>
 					{user && <ProductTypeForm formDisplay={formDisplay} toggleForm={toggleForm} />}
 					<SearchBox value={searchQuery} onChange={handleSearch}></SearchBox>
@@ -110,15 +110,15 @@ function ProductsType(props) {
 	}
 
 	return (
-		<div className="row">
-			<div className="col-3">
+		<div>
+			<div className="filter">
 				<ListGroup
 					items={categories}
 					selectedItem={selectedCategorie}
 					onItemSelect={handleCategorieSelect}
 				></ListGroup>
 			</div>
-			<div className="col">
+			<div>
 				<h3>il ya {totalCount} types de produit dans la base de données</h3>
 				{user && <ProductTypeForm formDisplay={formDisplay} toggleForm={toggleForm} />}
 				<SearchBox value={searchQuery} onChange={handleSearch}></SearchBox>

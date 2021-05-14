@@ -105,7 +105,7 @@ function Products(props) {
 
 	return (
 		<div>
-			<div>
+			<div className="filter">
 				<ListGroup items={types} selectedItem={selectedType} onItemSelect={handleTypeSelect}></ListGroup>
 			</div>
 			<div>
