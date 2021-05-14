@@ -90,11 +90,11 @@ function Products(props) {
 	const { user } = props;
 	if (totalCount === 0) {
 		return (
-			<div className="row">
-				<div className="col-3">
+			<div>
+				<div className="filter">
 					<ListGroup items={types} selectedItem={selectedType} onItemSelect={handleTypeSelect}></ListGroup>
 				</div>
-				<div className="col">
+				<div>
 					<h2>aucun produit dans la base de donnée</h2>
 					{user && <ProductForm formDisplay={formDisplay} toggleForm={toggleForm} />}
 					<SearchBox value={searchQuery} onChange={handleSearch}></SearchBox>
@@ -104,11 +104,11 @@ function Products(props) {
 	}
 
 	return (
-		<div className="row">
-			<div className="col-3">
+		<div>
+			<div>
 				<ListGroup items={types} selectedItem={selectedType} onItemSelect={handleTypeSelect}></ListGroup>
 			</div>
-			<div className="col">
+			<div>
 				<h3>il ya {totalCount} produits dans la base de données</h3>
 				{user && <ProductForm formDisplay={formDisplay} toggleForm={toggleForm} />}
 				<SearchBox value={searchQuery} onChange={handleSearch}></SearchBox>

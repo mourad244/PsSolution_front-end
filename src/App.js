@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { /* Router */ Switch, Route, Redirect } from 'react-router-dom';
 
-import NavBar from './common/navBar';
+// import NavBar from './common/navBar';
 import Services from './components/services';
 import ServiceForm from './components/serviceForm';
 import ServicesCategorie from './components/servicesCategorie';

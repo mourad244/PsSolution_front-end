@@ -19,3 +19,31 @@ h6 {
 .add-item .card-body {
 	display: none;
 }
+.filter {
+	display: table; /* Allow the centering to work */
+	margin: 0 auto;
+}
+
+.items {
+	min-width: 696px;
+	list-style: none;
+	padding-top: 20px;
+}
+.item {
+	display: inline-block;
+	margin: 5px;
+	padding: 5px;
+	border-style: groove;
+	border-radius: 15px;
+	background-color: rgb(236, 207, 77);
+}
+.item-active {
+	display: inline-block;
+	margin: 5px;
+	padding: 5px;
+	border-style: groove;
+	border-radius: 15px;
+	font-weight: bold;
+	color: aliceblue;
+	background-color: rgb(160, 98, 28);
+}
